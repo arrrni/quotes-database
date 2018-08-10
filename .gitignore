@@ -1,5 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
-/.idea
+/.idea'
+.env
 ### Symfony template
 # Cache and logs (Symfony2)
 /app/cache/*
