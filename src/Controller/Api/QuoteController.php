@@ -16,14 +16,54 @@ use Symfony\Component\HttpFoundation\Request;
 class QuoteController extends Controller
 {
     /**
-     * @param Request $request
      * @param QuoteProvider $provider
      * @return JsonResponse
      * @Route("/api/quotes", name="quotes", methods={"GET"})
      */
-    public function getQuotes(Request $request, QuoteProvider $provider): JsonResponse
+    public function getQuotes(QuoteProvider $provider): JsonResponse
     {
-        dump($provider->getAllQuotes());die;
-        return $this->json($provider->getAllQuotes());
+        $data = $provider->getAllQuotes();
+        if (null === $data) {
+            return $this->json(
+                [
+                    'error' => 'No quotes found.'
+                ],
+                404
+            );
+        }
+        return $this->json($data);
+    }
+
+    /**
+     * @param Request $request
+     * @param QuoteProvider $provider
+     * @return JsonResponse
+     * @Route("/api/quotes/{quoteId}", name="summoner_add", methods={"GET"})
+     */
+    public function getQuote(Request $request, QuoteProvider $provider): JsonResponse
+    {
+        $data = $provider->getQuote((int)$request->get('quoteId'));
+        if (null === $data) {
+            return $this->json(
+                [
+                    'error' => sprintf(
+                        'Quote ID %s not found.',
+                        $request->get('quoteId')
+                    )
+                ],
+                404
+            );
+        }
+        return $this->json($data);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @Route("/api/quotes/{quoteId}/rate")
+     */
+    public function rateQuote(Request $request)
+    {
+        return $this->json(['quote' => $request->get('quoteId')]);
     }
 }

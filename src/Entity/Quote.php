@@ -34,8 +34,8 @@ class Quote
     private $score;
 
     /**
-     * @var \DateTimeImmutable
-     * @ORM\Column(name="created_at", type="datetime_immutable")
+     * @var \DateTime
+     * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
 
@@ -86,17 +86,17 @@ class Quote
     }
 
     /**
-     * @return \DateTimeImmutable
+     * @return \DateTime
      */
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }
 
     /**
-     * @param \DateTimeImmutable $createdAt
+     * @param \DateTime $createdAt
      */
-    public function setCreatedAt(\DateTimeImmutable $createdAt): void
+    public function setCreatedAt(\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }

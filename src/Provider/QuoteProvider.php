@@ -34,10 +34,10 @@ class QuoteProvider
     /**
      * @return array
      */
-    public function getAllQuotes(): array
+    public function getAllQuotes(): ?array
     {
         $serializer = $this->getSerializer();
-        $result = [];
+        $result = null;
         $quotes = $this->entityManager->getRepository(Quote::class)->findAll();
         if (!empty($quotes)) {
             foreach ($quotes as $quote) {
@@ -45,6 +45,17 @@ class QuoteProvider
             }
         }
         return $result;
+    }
+
+    /**
+     * @param int $quoteId
+     * @return array
+     */
+    public function getQuote(int $quoteId): ?array
+    {
+        $serializer = $this->getSerializer();
+        $quote = $this->entityManager->getRepository(Quote::class)->find($quoteId);
+        return $serializer->normalize($quote);
     }
 
     /**
@@ -56,8 +67,18 @@ class QuoteProvider
         $encoders = [
             new JsonEncoder()
         ];
+        $objectNormalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
+        $dataCallback = function ($dateTime) {
+            return $dateTime instanceof \DateTime
+                ? $dateTime->format(\DateTime::ISO8601)
+                : '';
+        };
+        $objectNormalizer->setCallbacks([
+            'updatedAt' => $dataCallback,
+            'createdAt' => $dataCallback
+        ]);
         $normalizers = [
-            new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter()),
+            $objectNormalizer,
             new DateTimeNormalizer()
         ];
         return new Serializer($normalizers, $encoders);
