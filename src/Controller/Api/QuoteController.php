@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
+use App\Provider\QuoteProvider;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,8 +15,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class QuoteController extends Controller
 {
-    public function getQuotes(Request $request): JsonResponse
+    /**
+     * @param Request $request
+     * @param QuoteProvider $provider
+     * @return JsonResponse
+     * @Route("/api/quotes", name="quotes", methods={"GET"})
+     */
+    public function getQuotes(Request $request, QuoteProvider $provider): JsonResponse
     {
-        return $this->json(['test'=>'OK']);
+        dump($provider->getAllQuotes());die;
+        return $this->json($provider->getAllQuotes());
     }
 }
