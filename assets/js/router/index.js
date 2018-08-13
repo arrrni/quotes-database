@@ -4,7 +4,7 @@ Vue.use(Router);
 
 import Home from '../components/Home.vue'
 import Notfound from '../components/Notfound.vue'
-import Playground from '../components/Playground.vue'
+import About from '../components/About.vue'
 
 export default new Router({
     mode: 'history',
@@ -20,9 +20,9 @@ export default new Router({
             component: Notfound
         },
         {
-            path: '/playground',
-            name: 'playground',
-            component: Playground,
+            path: '/about',
+            name: 'about',
+            component: About,
         }
     ]
 })

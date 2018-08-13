@@ -10,7 +10,10 @@
   "author": "Artur Szymczyk <arturszymczyk1@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.18.0"
+    "@mdi/font": "^2.6.95",
+    "axios": "^0.18.0",
+    "buefy": "^0.6.6",
+    "vue-moment": "^4.0.0"
   },
   "devDependencies": {
     "@symfony/webpack-encore": "^0.20.1",
