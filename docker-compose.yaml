@@ -12,6 +12,8 @@ services:
       - /srv/app/var/cache/
       - /srv/app/var/logs/
       - /srv/app/var/sessions/
+    environment:
+      APP_ENV: dev
 
   nginx:
     build:
