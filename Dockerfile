@@ -1,5 +1,3 @@
-FROM composer:1.6 AS composer
-
 FROM node:9-alpine as node
 WORKDIR /build
 COPY package.json .
@@ -39,7 +37,7 @@ RUN set -xe \
 
 COPY docker/app/php.ini /usr/local/etc/php/php.ini
 
-COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY --from=composer:1.6 /usr/bin/composer /usr/bin/composer
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER 1
@@ -60,9 +58,12 @@ COPY --from=node /build/node_modules/ ./node_modules/
 
 COPY . /srv/app
 RUN ls -la
-RUN composer install --prefer-dist --no-dev --no-progress --no-suggest --classmap-authoritative --no-interaction \
-	&& composer clear-cache \
-	&& chown -R www-data var # Permissions hack because setfacl does not work on Mac and Windows
+#RUN composer install --prefer-dist --no-dev --no-progress --no-suggest --classmap-authoritative --no-interaction \
+#	&& composer clear-cache \
+#	&& chown -R www-data var # Permissions hack because setfacl does not work on Mac and Windows
+
+# Permissions hack because setfacl does not work on Mac and Windows
+RUN chown -R www-data var
 
 ENTRYPOINT ["docker-app-entrypoint"]
 CMD ["php-fpm"]
