@@ -18,6 +18,14 @@ services:
     environment:
       - SYMFONY_VERSION
 
+  yarn:
+    image: node:9
+    user: "1000:1000"
+    volumes:
+      - .:/app
+    command: sh -c "yarn install --frozen-lockfile && yarn run encore dev --watch"
+    working_dir: /app/assets
+
   nginx:
     build:
       context: .

@@ -1,9 +1,3 @@
-FROM node:9-alpine as node
-WORKDIR /build
-COPY package.json .
-COPY yarn.lock .
-RUN yarn install --pure-lockfile && yarn cache clean
-
 FROM php:7.2-fpm-alpine
 
 RUN apk add --no-cache --virtual .persistent-deps \
@@ -52,8 +46,6 @@ ARG SYMFONY_VERSION=""
 
 ###> recipes ###
 ###< recipes ###
-
-COPY --from=node /build/node_modules/ ./node_modules/
 
 COPY . .
 
