@@ -4477,6 +4477,10 @@ regexpu-core@^2.0.0:
     regjsgen "^0.2.0"
     regjsparser "^0.1.4"
 
+register-service-worker@^1.0.0:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/register-service-worker/-/register-service-worker-1.5.1.tgz#4f91d8915f6019b083433b83ffe4bfd6f976f342"
+
 regjsgen@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/regjsgen/-/regjsgen-0.2.0.tgz#6c016adeac554f75823fe37ac05b92d5a4edb1f7"
