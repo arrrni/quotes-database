@@ -3,7 +3,7 @@
         <div class="card tile is-vertical">
             <header class="card-header is-light">
                 <p class="card-header-title">
-                    <a href="#">#1</a>&nbsp;<b-icon icon="plus" size="is-small"></b-icon>&nbsp;0&nbsp;<b-icon icon="minus" size="is-small"></b-icon>
+                    <router-link :to="`/q/${quoteData.id}`">#{{ quoteData.id }}</router-link>&nbsp;<b-icon icon="plus" size="is-small"></b-icon>&nbsp;{{ quoteData.score }}&nbsp;<b-icon icon="minus" size="is-small"></b-icon>
                 </p>
                 <a href="#" class="card-header-icon" aria-label="more options">
       <span class="icon">
@@ -13,14 +13,11 @@
             </header>
             <div class="card-content">
                 <div class="quote-content content">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis mauris.
-                    <a href="#">@bulmaio</a>. <a href="#">#css</a> <a href="#">#responsive</a>
-                    <br>
-                    <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                    {{ quoteData.content }}
                 </div>
             </div>
             <footer class="card-footer">
-                <time class="card-footer-item heading"><span>{{ new Date() | moment("dddd, MMMM Do YYYY") }}</span></time>
+                <time class="card-footer-item heading"><span>{{ new Date(quoteData.created_at) | moment("dddd, MMMM Do YYYY") }}</span></time>
             </footer>
         </div>
     </section>
@@ -28,7 +25,21 @@
 
 <script>
     export default {
-        name: "quote"
+        name: "quote",
+        props: {
+            quoteData: {
+                type: Object,
+                default: function () {
+                    return {
+                        id: 0,
+                        content: '',
+                        created_at: Date.now(),
+                        score: 0,
+                        updated_at: Date.now()
+                    }
+                }
+            }
+        }
     }
 </script>
 

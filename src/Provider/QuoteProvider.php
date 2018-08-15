@@ -70,7 +70,7 @@ class QuoteProvider
         $objectNormalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
         $dataCallback = function ($dateTime) {
             return $dateTime instanceof \DateTime
-                ? $dateTime->format(\DateTime::ISO8601)
+                ? $dateTime->format('Y-m-d h:i:s')
                 : '';
         };
         $objectNormalizer->setCallbacks([
