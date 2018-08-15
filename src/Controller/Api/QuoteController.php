@@ -38,7 +38,7 @@ class QuoteController extends Controller
      * @param Request $request
      * @param QuoteProvider $provider
      * @return JsonResponse
-     * @Route("/api/quotes/{quoteId}", name="summoner_add", methods={"GET"})
+     * @Route("/api/quotes/{quoteId}", name="quote", methods={"GET"})
      */
     public function getQuote(Request $request, QuoteProvider $provider): JsonResponse
     {

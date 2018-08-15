@@ -41,7 +41,7 @@
             <Quote/>
             <hr>
             <b-pagination
-                    :total="total"
+                    :total="totalQuotes"
                     :current.sync="current"
                     :order="order"
                     :size="size"
@@ -60,7 +60,6 @@
         name: 'home',
         data () {
             return {
-                total: 200,
                 current: 1,
                 perPage: 20,
                 order: '',
@@ -68,6 +67,12 @@
                 isSimple: false,
                 isRounded: false
             }
+        },
+        computed: {
+            totalQuotes: function () {
+                return 200
+            },
+            quotes: function () {}
         },
         components: {
             Quote

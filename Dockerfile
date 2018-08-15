@@ -11,11 +11,15 @@ RUN set -xe \
 		$PHPIZE_DEPS \
 		icu-dev \
 		zlib-dev \
+		openssl \
+        openssl-dev \
 	&& docker-php-ext-install \
 		intl \
 		zip \
+		pdo_mysql \
 	&& pecl install \
 		apcu-${APCU_VERSION} \
+		openssl \
 	&& docker-php-ext-enable --ini-name 20-apcu.ini apcu \
 	&& docker-php-ext-enable --ini-name 05-opcache.ini opcache \
 	&& apk del .build-deps
