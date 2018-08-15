@@ -2,9 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 Vue.use(Router);
 
-import Home from '../components/Home.vue'
-import Notfound from '../components/Notfound.vue'
-import About from '../components/About.vue'
+import Home from '../pages/Home.vue'
+import Notfound from '../pages/Notfound.vue'
+import About from '../pages/About.vue'
+import ViewQuote from '../pages/ViewQuote.vue'
 
 export default new Router({
     mode: 'history',
@@ -23,6 +24,11 @@ export default new Router({
             path: '/about',
             name: 'about',
             component: About,
+        },
+        {
+            path: '/q/:id',
+            name: 'viewQuote',
+            component: ViewQuote
         }
     ]
 })

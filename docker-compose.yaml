@@ -19,12 +19,12 @@ services:
       - SYMFONY_VERSION
 
   yarn:
-    image: node:9
+    image: node:10-alpine
     user: "1000:1000"
     volumes:
       - .:/app
-    command: sh -c "yarn install --frozen-lockfile && yarn run encore dev --watch"
-    working_dir: /app/assets
+    command: sh -c "yarn install --frozen-lockfile && yarn dev --watch"
+    working_dir: /app
 
   nginx:
     build:

@@ -6,7 +6,7 @@ import VueMoment from 'vue-moment'
 
 import eventBus from './helpers/eventBus'
 
-import App from './App'
+import App from './App.vue'
 
 Vue.config.productionTip = false;
 
