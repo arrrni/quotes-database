@@ -31,6 +31,5 @@ class RatingManager
      */
     public function updateRatingStats(int $quoteId, bool $rating)
     {
-
     }
 }

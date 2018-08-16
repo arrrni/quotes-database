@@ -13,7 +13,7 @@
             <hr>
         </section>
         <section v-else>
-            <b-loading :active.sync="loading" :can-cancel="true"></b-loading>
+            <b-loading :active.sync="loading"></b-loading>
             <Quote :quote-data="quote"/>
             <hr>
         </section>

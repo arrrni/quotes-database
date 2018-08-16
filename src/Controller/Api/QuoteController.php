@@ -16,13 +16,17 @@ use Symfony\Component\HttpFoundation\Request;
 class QuoteController extends Controller
 {
     /**
+     * @param Request $request
      * @param QuoteProvider $provider
      * @return JsonResponse
-     * @Route("/api/quotes", name="quotes", methods={"GET"})
+     * @Route("/api/quotes/page/{pageNumber}/{perPage}", name="quotes", methods={"GET"})
      */
-    public function getQuotes(QuoteProvider $provider): JsonResponse
+    public function getQuotes(Request $request, QuoteProvider $provider): JsonResponse
     {
-        $data = $provider->getAllQuotes();
+        $data = $provider->getAllQuotes(
+            (int)$request->get('perPage', 20),
+            (int)$request->get('pageNumber', 1)
+        );
         if (null === $data) {
             return $this->json(
                 [
@@ -62,8 +66,17 @@ class QuoteController extends Controller
      * @return JsonResponse
      * @Route("/api/quotes/{quoteId}/rate")
      */
-    public function rateQuote(Request $request)
+    public function rateQuote(Request $request): JsonResponse
     {
         return $this->json(['quote' => $request->get('quoteId')]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function addQuote(Request $request): JsonResponse
+    {
+        return $this->json([$request->request->all()]);
     }
 }

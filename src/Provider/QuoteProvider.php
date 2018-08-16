@@ -5,6 +5,8 @@ namespace App\Provider;
 
 use App\Entity\Quote;
 use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Pagerfanta\Pagerfanta;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -32,18 +34,37 @@ class QuoteProvider
     }
 
     /**
+     * @param int $perPage
+     * @param int $page
      * @return array
      */
-    public function getAllQuotes(): ?array
+    public function getAllQuotes(int $perPage, int $page): ?array
     {
-        $serializer = $this->getSerializer();
         $result = null;
-        $quotes = $this->entityManager->getRepository(Quote::class)->findAll();
+        $serializer = $this->getSerializer();
+        $adapter = new DoctrineORMAdapter(
+            $this->entityManager->createQueryBuilder()
+                ->select('quote')
+                ->from(Quote::class, 'quote')
+        );
+        $paginator = new Pagerfanta($adapter);
+        $paginator->setMaxPerPage($perPage);
+        $paginator->setCurrentPage($page);
+
+        $quotes = $paginator->getCurrentPageResults();
+
         if (!empty($quotes)) {
+            $quotesData = [];
             foreach ($quotes as $quote) {
-                $result[] = $serializer->normalize($quote);
+                $quotesData[] = $serializer->normalize($quote);
             }
+            $result = [
+                'total' => $paginator->getNbResults(),
+                'count' => count($quotesData),
+                'quotes' => $quotesData,
+            ];
         }
+
         return $result;
     }
 

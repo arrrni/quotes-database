@@ -8,7 +8,7 @@
             <div class="level-left">
                 <div class="level-item">
                     <p class="subtitle is-5">
-                        <strong>123</strong> quotes total
+                        <strong>{{ pagination.total }}</strong> quotes total
                     </p>
                 </div>
                 <div class="level-item">
@@ -34,20 +34,20 @@
             </div>
         </nav>
         <div class="container">
-            <Quote/>
-            <hr>
-            <Quote/>
-            <hr>
-            <Quote/>
-            <hr>
+            <b-loading :active.sync="loading"></b-loading>
+            <div v-for="quote in quotes">
+                <Quote :quote-data="quote" :key="quote.id"/>
+                <hr>
+            </div>
             <b-pagination
-                    :total="totalQuotes"
-                    :current.sync="current"
-                    :order="order"
-                    :size="size"
-                    :simple="isSimple"
-                    :rounded="isRounded"
-                    :per-page="perPage">
+                    :total="pagination.total"
+                    :current.sync="pagination.current"
+                    :order="pagination.order"
+                    :size="pagination.size"
+                    :simple="pagination.isSimple"
+                    :rounded="pagination.isRounded"
+                    :per-page="pagination.perPage"
+                    @change="pageChange">
             </b-pagination>
         </div>
         <br>
@@ -60,19 +60,43 @@
         name: 'home',
         data () {
             return {
-                current: 1,
-                perPage: 20,
-                order: '',
-                size: '',
-                isSimple: false,
-                isRounded: false
+                quotes: [],
+                pagination: {
+                    current: 1,
+                    total: 0,
+                    startFrom: 0,
+                    perPage: 20,
+                    order: '',
+                    size: '',
+                    isSimple: false,
+                    isRounded: false
+                },
+                loading: true
             }
         },
-        computed: {
-            totalQuotes: function () {
-                return 200
+        mounted () {
+            this.fetchQuotes(this.pagination.current, this.pagination.perPage)
+        },
+        methods: {
+            fetchQuotes (page, perPage) {
+                this.quotes = []
+                this.loading = true
+                axios
+                    .get('/api/quotes/page/' + page + '/' + perPage)
+                    .then(response => {
+                        this.quotes = response.data.quotes
+                        this.pagination.total = response.data.total
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        this.error = true
+                    })
+                    .finally(() => this.loading = false)
             },
-            quotes: function () {}
+            pageChange (page) {
+                this.currentPage = page
+                this.fetchQuotes(page, this.pagination.perPage)
+            }
         },
         components: {
             Quote

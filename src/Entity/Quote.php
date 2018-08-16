@@ -46,6 +46,14 @@ class Quote
     private $updatedAt;
 
     /**
+     * Quote constructor.
+     */
+    public function __construct()
+    {
+        $this->updatedAt = new \DateTime();
+    }
+
+    /**
      * @return int
      */
     public function getId(): int
@@ -110,10 +118,11 @@ class Quote
     }
 
     /**
+     * @param \DateTime $updatedAt
      * @return void
      */
-    public function setUpdatedAt(): void
+    public function setUpdatedAt(\DateTime $updatedAt): void
     {
-        $this->updatedAt = new \DateTime();
+        $this->updatedAt = $updatedAt;
     }
 }

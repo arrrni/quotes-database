@@ -17,6 +17,9 @@
     "doctrine/common": {
         "version": "v2.9.0"
     },
+    "doctrine/data-fixtures": {
+        "version": "v1.3.1"
+    },
     "doctrine/dbal": {
         "version": "v2.8.0"
     },
@@ -31,6 +34,15 @@
     },
     "doctrine/doctrine-cache-bundle": {
         "version": "1.3.3"
+    },
+    "doctrine/doctrine-fixtures-bundle": {
+        "version": "3.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "2ea6070ecf365f9a801ccaed4b31d4a3b7af5693"
+        }
     },
     "doctrine/doctrine-migrations-bundle": {
         "version": "1.2",
@@ -65,8 +77,23 @@
     "doctrine/reflection": {
         "version": "v1.0.0"
     },
+    "fzaninotto/faker": {
+        "version": "v1.8.0"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
+    },
+    "myclabs/deep-copy": {
+        "version": "1.8.1"
+    },
+    "nelmio/alice": {
+        "version": "3.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "3.2",
+            "ref": "5ef2976310e8f9621c1a722a73bfbe115c1559a3"
+        }
     },
     "nikic/php-parser": {
         "version": "v4.0.3"
@@ -76,6 +103,9 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.2.0"
+    },
+    "pagerfanta/pagerfanta": {
+        "version": "v2.0.1"
     },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
@@ -236,6 +266,15 @@
     "symfony/test-pack": {
         "version": "v1.0.2"
     },
+    "symfony/translation": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "6bcd6c570c017ea6ae5a7a6a027c929fd3542cd8"
+        }
+    },
     "symfony/twig-bridge": {
         "version": "v4.1.3"
     },
@@ -268,6 +307,9 @@
     },
     "webmozart/assert": {
         "version": "1.3.0"
+    },
+    "white-october/pagerfanta-bundle": {
+        "version": "v1.2.1"
     },
     "zendframework/zend-code": {
         "version": "3.3.0"
