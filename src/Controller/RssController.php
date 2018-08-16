@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 class RssController extends Controller
 {
     /**
-     * @Route("/rss", name="vue_sub_pages", requirements={"route"="(?!api\b)\b.+"})
+     * @Route("/rss", name="rss")
      * @param Request $request
      * @param RssFeedProvider $provider
      * @return Response
