@@ -35,6 +35,17 @@
         </nav>
         <div class="container">
             <b-loading :active.sync="loading"></b-loading>
+            <div v-if="isEmptyMessage">
+                <article class="message is-warning">
+                    <div class="message-header">
+                        <p>Message</p>
+                    </div>
+                    <div class="message-body">
+                        No quotes found in database.
+                    </div>
+                </article>
+                <hr>
+            </div>
             <div v-for="quote in quotes">
                 <Quote :quote-data="quote" :key="quote.id"/>
                 <hr>
@@ -71,7 +82,7 @@
                     isSimple: false,
                     isRounded: false
                 },
-                loading: true
+                loading: false
             }
         },
         mounted () {
@@ -96,6 +107,11 @@
             pageChange (page) {
                 this.currentPage = page
                 this.fetchQuotes(page, this.pagination.perPage)
+            }
+        },
+        computed: {
+            isEmptyMessage: function () {
+                return this.pagination.total === 0;
             }
         },
         components: {

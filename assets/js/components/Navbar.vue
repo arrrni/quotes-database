@@ -15,7 +15,7 @@
                     <router-link class="navbar-item" to="/about" @click="toggleMenu">
                         <b-icon icon="information-outline" size="is-small"></b-icon><span>About</span>
                     </router-link>
-                    <router-link class="navbar-item" to="/new" @click="toggleMenu">
+                    <router-link class="navbar-item" to="/add" @click="toggleMenu">
                         <b-icon icon="plus" size="is-small"></b-icon><span>New quote</span>
                     </router-link>
                 </div>

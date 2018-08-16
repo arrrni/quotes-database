@@ -6,6 +6,7 @@ import Home from '../pages/Home.vue'
 import Notfound from '../pages/Notfound.vue'
 import About from '../pages/About.vue'
 import ViewQuote from '../pages/ViewQuote.vue'
+import AddQuote from '../pages/AddQuote.vue'
 
 export default new Router({
     mode: 'history',
@@ -29,6 +30,11 @@ export default new Router({
             path: '/q/:id',
             name: 'viewQuote',
             component: ViewQuote
+        },
+        {
+            path: '/add',
+            name: 'addQuote',
+            component: AddQuote
         }
     ]
 })
