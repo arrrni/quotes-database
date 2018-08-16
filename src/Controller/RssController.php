@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 class RssController extends Controller
 {
     /**
-     * @Route("/rss", name="rss")
+     * @Route("/api/feed", name="rss")
      * @param Request $request
      * @param RssFeedProvider $provider
      * @return Response

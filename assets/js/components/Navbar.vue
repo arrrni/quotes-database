@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="navbar-end">
-                    <a class="navbar-item" href="/rss" @click="toggleMenu">
+                    <a class="navbar-item" href="/api/feed" @click="toggleMenu">
                         <b-icon icon="rss" size="is-small"></b-icon><span>RSS</span>
                     </a>
                 </div>

@@ -1,7 +1,7 @@
 <template>
     <section id="quote">
         <div class="card tile is-vertical">
-            <header class="card-header is-light">
+            <header v-if="!isPreview" class="card-header is-light">
                 <p class="card-header-title">
                     <router-link :to="`/q/${quoteData.id}`">#{{ quoteData.id }}</router-link>&nbsp;<b-icon icon="plus" size="is-small"></b-icon>&nbsp;{{ quoteData.score }}&nbsp;<b-icon icon="minus" size="is-small"></b-icon>
                 </p>
@@ -12,9 +12,7 @@
                 </a>
             </header>
             <div class="card-content">
-                <div class="quote-content content">
-                    {{ quoteData.content }}
-                </div>
+                <div class="quote-content content" v-html="quoteData.content"></div>
             </div>
             <footer class="card-footer">
                 <time class="card-footer-item heading"><span>{{ new Date(quoteData.created_at) | moment("dddd, MMMM Do YYYY") }}</span></time>
@@ -38,7 +36,8 @@
                         updated_at: Date.now()
                     }
                 }
-            }
+            },
+            isPreview: false
         }
     }
 </script>
