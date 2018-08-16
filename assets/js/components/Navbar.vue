@@ -21,9 +21,9 @@
                 </div>
 
                 <div class="navbar-end">
-                    <router-link class="navbar-item" to="/rss" @click="toggleMenu">
+                    <a class="navbar-item" href="/rss" @click="toggleMenu">
                         <b-icon icon="rss" size="is-small"></b-icon><span>RSS</span>
-                    </router-link>
+                    </a>
                 </div>
             </div>
         </div>
