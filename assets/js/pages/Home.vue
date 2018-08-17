@@ -86,27 +86,39 @@
             }
         },
         mounted () {
+            if (!this.isEmpty(this.$route.query)) {
+                this.pagination.current = this.$route.query.page
+            }
             this.fetchQuotes(this.pagination.current, this.pagination.perPage)
         },
         methods: {
             fetchQuotes (page, perPage) {
-                this.quotes = []
-                this.loading = true
+                this.quotes = [];
+                this.loading = true;
+                this.$route.query.page = this.pagination.current;
                 axios
                     .get('/api/quotes/page/' + page + '/' + perPage)
                     .then(response => {
-                        this.quotes = response.data.quotes
-                        this.pagination.total = response.data.total
+                        this.quotes = response.data.quotes;
+                        this.pagination.total = response.data.total;
                     })
                     .catch(error => {
-                        console.log(error)
-                        this.error = true
+                        console.log(error);
+                        this.error = true;
                     })
                     .finally(() => this.loading = false)
             },
             pageChange (page) {
-                this.currentPage = page
-                this.fetchQuotes(page, this.pagination.perPage)
+                this.currentPage = page;
+                this.fetchQuotes(page, this.pagination.perPage);
+                this.$router.push({ query: { page: page } });
+            },
+            isEmpty(obj) {
+                for(let key in obj) {
+                    if(obj.hasOwnProperty(key))
+                        return false;
+                }
+                return true;
             }
         },
         computed: {
