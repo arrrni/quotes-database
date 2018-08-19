@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
+use App\Entity\Quote;
 use App\Provider\QuoteProvider;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -64,19 +66,38 @@ class QuoteController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
-     * @Route("/api/quotes/{quoteId}/rate")
+     * @Route("/api/quotes/{quoteId}/rate/{type}")
      */
     public function rateQuote(Request $request): JsonResponse
     {
-        return $this->json(['quote' => $request->get('quoteId')]);
+        return $this->json(['quote' => $request->get('quoteId'), 'rate' => $request->get('type')]);
     }
 
     /**
      * @param Request $request
-     * @return JsonResponse
+     * @return Response
+     * @Route("/api/quotes/add", methods={"POST"})
      */
-    public function addQuote(Request $request): JsonResponse
+    public function addQuote(Request $request): Response
     {
-        return $this->json([$request->request->all()]);
+        $content = json_decode($request->getContent(), true);
+        if (array_key_exists('content', $content) && !empty($content['content'])) {
+            $quote = new Quote();
+            $quote->setScore(0);
+            $quote->setContent($content['content']);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($quote);
+            $em->flush();
+            $message = ['message' => 'Quote created!', 'quote_id' => $quote->getId()];
+
+            $response = new Response(json_encode($message), 201);
+            $response->headers->set('Content-Type', 'application/json');
+            $response->headers->set('Location', '/api/quotes/'. $quote->getId());
+            return $response;
+        }
+        $message = ['message' => 'Content cannot be empty.'];
+        $response = new Response(json_encode($message), 400);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }
 }

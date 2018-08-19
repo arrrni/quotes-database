@@ -86,6 +86,7 @@
             }
         },
         mounted () {
+            this.$store.commit('setUser', 'some_user');
             if (!this.isEmpty(this.$route.query)) {
                 this.pagination.current = this.$route.query.page
             }

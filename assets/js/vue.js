@@ -1,6 +1,8 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 import router from './router/'
+import store from './store/'
 import Buefy from 'buefy'
 import VueMoment from 'vue-moment'
 
@@ -21,7 +23,7 @@ Vue.use(VueMoment);
 let application = new Vue({
     el: '#vueApp',
     router,
-    // store,
+    store,
     template: '<App/>',
     components: { App }
 })

@@ -16,7 +16,12 @@
         </div>
         <div class="columns">
             <div class="column">
-                <a class="button is-primary" @click="saveQuote"><b-icon icon="floppy" size="is-small"></b-icon><span>Save</span></a>&nbsp;<a class="button" @click="togglePreview">Podgląd</a>
+                <a class="button is-primary" @click="saveQuote">
+                    <b-icon icon="floppy" size="is-small"></b-icon><span>Save</span>
+                </a>&nbsp;
+                <a class="button" @click="togglePreview">
+                    <b-icon icon="magnify" size="is-small"></b-icon><span>Preview</span>
+                </a>
             </div>
         </div>
         <hr>
@@ -41,8 +46,7 @@
                 content: '',
                 customToolbar: [
                     ['bold', 'italic', 'underline'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['image', 'code-block']
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }]
                 ],
                 isPreviewModalActive: false
             }
@@ -67,11 +71,21 @@
                         type: 'is-danger'
                     })
                 } else {
-                    this.$toast.open({
-                        duration: 5000,
-                        message: 'This would be message for saving something successfully!',
-                        type: 'is-success'
-                    })
+                    axios.post('/api/quotes/add', { content: this.content }).then(response => {
+                        let quoteId = response.data.quote_id;
+                        this.$toast.open({
+                            duration: 5000,
+                            message: response.data.message,
+                            type: 'is-success'
+                        });
+                        this.$router.push({ path: `/q/${quoteId}` })
+                    }).catch(error => {
+                        this.$toast.open({
+                            duration: 5000,
+                            message: error.data.message,
+                            type: 'is-danger'
+                        })
+                    });
                 }
             },
             togglePreview: function () {
