@@ -1,12 +1,10 @@
-version: '3'
+version: '3.4'
 
 services:
   app:
     build:
       context: .
-      args:
-        SYMFONY_VERSION: ${SYMFONY_VERSION}
-        STABILITY: ${STABILITY}
+      target: quotes_database_php
     volumes:
       # Comment out the next line in production
       - ./:/srv/app:rw,cached
@@ -18,18 +16,10 @@ services:
     environment:
       - SYMFONY_VERSION
 
-  yarn:
-    image: node:10-alpine
-    user: "1000:1000"
-    volumes:
-      - .:/app
-    command: sh -c "yarn install --frozen-lockfile && yarn dev --watch"
-    working_dir: /app
-
   nginx:
     build:
       context: .
-      dockerfile: ./Dockerfile.nginx
+      target: quotes_database_nginx
     depends_on:
       - app
     volumes:
@@ -38,6 +28,18 @@ services:
       - ./public:/srv/app/public:ro
     ports:
       - '80:80'
+
+  # This HTTP/2 proxy is not secure: it should only be used in dev
+  h2-proxy:
+    build:
+      context: .
+      target: quotes_database_h2-proxy
+    depends_on:
+      - nginx
+    volumes:
+      - ./docker/h2-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - '443:443'
 
   db:
      image: mysql:5.7
@@ -50,3 +52,11 @@ services:
        MYSQL_PASSWORD: test
      ports:
        - '3306:3306'
+
+  yarn:
+     image: node:10-alpine
+     user: "1000:1000"
+     volumes:
+       - .:/app
+     command: sh -c "yarn install --frozen-lockfile && yarn dev --watch"
+     working_dir: /app
