@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Provider;
 
-use App\Entity\Quote;
+use App\Domain\Entity\Quote;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;

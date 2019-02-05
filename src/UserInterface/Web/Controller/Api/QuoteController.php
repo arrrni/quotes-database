@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controller\Api;
+namespace App\UserInterface\Web\Controller\Api;
 
-use App\Entity\Quote;
+use App\Domain\Entity\Quote;
 use App\Provider\QuoteProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

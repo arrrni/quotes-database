@@ -9,7 +9,7 @@
 namespace App\Provider;
 
 
-use App\Entity\Quote;
+use App\Domain\Entity\Quote;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RssFeedProvider
