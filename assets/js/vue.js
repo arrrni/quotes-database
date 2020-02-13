@@ -1,12 +1,14 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 import router from './router/'
+import store from './store/'
 import Buefy from 'buefy'
 import VueMoment from 'vue-moment'
 
 import eventBus from './helpers/eventBus'
 
-import App from './App'
+import App from './App.vue'
 
 Vue.config.productionTip = false;
 
@@ -21,7 +23,7 @@ Vue.use(VueMoment);
 let application = new Vue({
     el: '#vueApp',
     router,
-    // store,
+    store,
     template: '<App/>',
     components: { App }
 })

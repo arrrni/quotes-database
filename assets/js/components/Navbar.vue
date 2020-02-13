@@ -12,18 +12,18 @@
 
             <div id="navbarExampleTransparentExample" class="navbar-menu" :class="{'is-active': navIsActive}">
                 <div class="navbar-start">
-                    <router-link class="navbar-item" to="/about">
+                    <router-link class="navbar-item" to="/about" @click="toggleMenu">
                         <b-icon icon="information-outline" size="is-small"></b-icon><span>About</span>
                     </router-link>
-                    <router-link class="navbar-item" to="/new">
+                    <router-link class="navbar-item" to="/add" @click="toggleMenu">
                         <b-icon icon="plus" size="is-small"></b-icon><span>New quote</span>
                     </router-link>
                 </div>
 
                 <div class="navbar-end">
-                    <router-link class="navbar-item" to="/rss">
+                    <a class="navbar-item" href="/api/feed" @click="toggleMenu">
                         <b-icon icon="rss" size="is-small"></b-icon><span>RSS</span>
-                    </router-link>
+                    </a>
                 </div>
             </div>
         </div>

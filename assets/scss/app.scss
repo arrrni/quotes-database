@@ -2,9 +2,22 @@
 @import "~@mdi/font/css/materialdesignicons.css";
 
 .main {
+  @media only screen and (max-width: 768px) {
+    margin-top: 4.5rem;
+  }
+  @media only screen and (max-width: 1024px) {
+    margin-top: 3.5rem;
+  }
   margin-top: 1.5rem;
+  @media only screen and (min-width: 320px) and (max-width: 568px) {
+    margin-top: 3.5rem;
+  }
 }
 
 .main-heading {
   margin-bottom: 1.5rem;
+}
+
+.quote-content {
+  font-family: "Lucida Console", "Droid Sans Mono", "Liberation Sans Mono", "DejaVu Sans Mono", Monaco;
 }
