@@ -1,78 +1,127 @@
-ARG PHP_VERSION=7.2
-ARG NGINX_VERSION=1.15
+ARG PHP_VERSION=8.1
+ARG CADDY_VERSION=2
 
-### NGINX
-FROM nginx:${NGINX_VERSION}-alpine AS quotes_database_nginx
-
-COPY docker/nginx/conf.d /etc/nginx/conf.d/
-COPY public /srv/app/public/
-
-### H2 PROXY
-FROM alpine:latest AS quotes_database_h2-proxy-cert
-
-RUN apk add --no-cache openssl
-
-# Self-generated cert for dev purpose, DON'T USE IT IN PROD!
-RUN openssl genrsa -des3 -passout pass:NotSecure -out server.pass.key 2048
-RUN openssl rsa -passin pass:NotSecure -in server.pass.key -out server.key
-RUN rm server.pass.key
-RUN openssl req -new -passout pass:NotSecure -key server.key -out server.csr \
-    -subj '/C=SS/ST=SS/L=Gotham City/O=Symfony/CN=localhost'
-RUN openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out server.crt
-
-FROM nginx:${NGINX_VERSION}-alpine AS quotes_database_h2-proxy
-
-RUN mkdir -p /etc/nginx/ssl/
-COPY --from=quotes_database_h2-proxy-cert server.key server.crt /etc/nginx/ssl/
-COPY ./docker/h2-proxy/default.conf /etc/nginx/conf.d/default.conf
-
-### PHP
+# "php" stage
 FROM php:${PHP_VERSION}-fpm-alpine AS quotes_database_php
 
-RUN apk add --no-cache --virtual .persistent-deps \
+# persistent / runtime deps
+RUN apk add --no-cache \
+		acl \
+		fcgi \
+		file \
+		gettext \
 		git \
-		icu-libs \
-		zlib \
-		libzip
+        icu-libs \
+        zlib \
+        libzip \
+	;
 
-ENV APCU_VERSION 5.1.12
-RUN set -eux \
-	&& apk add --no-cache --virtual .build-deps \
+ARG APCU_VERSION=5.1.21
+RUN set -eux; \
+	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
 		icu-dev \
-		zlib-dev \
 		libzip-dev \
-	&& docker-php-ext-install \
+		zlib-dev \
+        postgresql-dev \
+    ; \
+	\
+	docker-php-ext-configure zip; \
+	docker-php-ext-install -j$(nproc) \
 		intl \
 		zip \
-		pdo_mysql \
-	&& pecl install \
+        pdo_pgsql \
+    ; \
+	pecl install \
 		apcu-${APCU_VERSION} \
-	&& docker-php-ext-enable --ini-name 20-apcu.ini apcu \
-	&& docker-php-ext-enable --ini-name 05-opcache.ini opcache \
-	&& apk del .build-deps
+	; \
+	pecl clear-cache; \
+    docker-php-ext-enable \
+        apcu \
+        opcache \
+        pdo_pgsql \
+	; \
+	\
+	runDeps="$( \
+		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
+			| tr ',' '\n' \
+			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+	)"; \
+	apk add --no-cache --virtual .phpexts-rundeps $runDeps; \
+	\
+	apk del .build-deps
+
+COPY docker/php/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
+RUN chmod +x /usr/local/bin/docker-healthcheck
+
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
 
 RUN ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
-COPY docker/app/conf.d/symfony.ini $PHP_INI_DIR/conf.d/symfony.ini
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-COPY docker/app/docker-entrypoint.sh /usr/local/bin/docker-app-entrypoint
-RUN chmod +x /usr/local/bin/docker-app-entrypoint
+COPY docker/php/conf.d/symfony.prod.ini $PHP_INI_DIR/conf.d/symfony.ini
 
-WORKDIR /srv/app
-ENTRYPOINT ["docker-app-entrypoint"]
-CMD ["php-fpm"]
+COPY docker/php/php-fpm.d/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
+
+COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+
+VOLUME /var/run/php
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
-ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-RUN composer global require "symfony/flex" --prefer-dist --no-progress --no-suggest --classmap-authoritative  --no-interaction
+ENV PATH="${PATH}:/root/.composer/vendor/bin"
+
+WORKDIR /srv/app
+
+# Allow to choose skeleton
+ARG SKELETON="symfony/skeleton"
+ENV SKELETON ${SKELETON}
+
+# Allow to use development versions of Symfony
+ARG STABILITY="stable"
+ENV STABILITY ${STABILITY}
+
+# Allow to select skeleton version
+ARG SYMFONY_VERSION=""
+ENV SYMFONY_VERSION ${SYMFONY_VERSION}
+
+# Download the Symfony skeleton and leverage Docker cache layers
+RUN composer create-project "${SKELETON} ${SYMFONY_VERSION}" . --stability=$STABILITY --prefer-dist --no-dev --no-progress --no-interaction; \
+	composer clear-cache
 
 ###> recipes ###
 ###< recipes ###
 
 COPY . .
 
-RUN mkdir -p var/cache var/logs var/sessions \
-    && composer install --prefer-dist --no-dev --no-scripts --no-progress --no-suggest --classmap-authoritative --no-interaction \
-    && composer clear-cache \
-    && chown -R www-data var
+RUN set -eux; \
+	mkdir -p var/cache var/log; \
+	composer install --prefer-dist --no-dev --no-progress --no-scripts --no-interaction; \
+	composer dump-autoload --classmap-authoritative --no-dev; \
+	composer symfony:dump-env prod; \
+	composer run-script --no-dev post-install-cmd; \
+	chmod +x bin/console; sync
+VOLUME /srv/app/var
+
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["php-fpm"]
+
+FROM caddy:${CADDY_VERSION}-builder-alpine AS quotes_database_caddy_builder
+
+RUN xcaddy build \
+	--with github.com/dunglas/mercure \
+	--with github.com/dunglas/mercure/caddy \
+	--with github.com/dunglas/vulcain \
+	--with github.com/dunglas/vulcain/caddy
+
+FROM caddy:${CADDY_VERSION} AS quotes_database_caddy
+
+WORKDIR /srv/app
+
+COPY --from=dunglas/mercure:v0.11 /srv/public /srv/mercure-assets/
+COPY --from=quotes_database_caddy_builder /usr/bin/caddy /usr/bin/caddy
+COPY --from=quotes_database_php /srv/app/public public/
+COPY docker/caddy/Caddyfile /etc/caddy/Caddyfile

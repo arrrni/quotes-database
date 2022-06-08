@@ -1,36 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: aszymczyk
- * Date: 16.08.18
- * Time: 18:27
- */
+
+declare(strict_types=1);
 
 namespace App\Provider;
-
 
 use App\Entity\Quote;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RssFeedProvider
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * QuoteProvider constructor.
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @return string
-     */
     public function getFeed(): string
     {
         $xml = '<?xml version="1.0" encoding="ISO-8859-1"?>';
@@ -41,16 +23,19 @@ class RssFeedProvider
         $data = $this->entityManager->getRepository(Quote::class)->findBy([], ['id' => 'DESC']);
         if(!empty($data)) {
             foreach ($data as $quote) {
-                $xml .= '<item>';
-                $xml .= sprintf('<title>Quote #%d</title>', $quote->getId());
-                $xml .= sprintf('<description>%s</description>', $quote->getContent());
-                $xml .= sprintf('<link>%s/q/%d</link>', getenv('APP_DOMAIN'), $quote->getId());
-                $xml .= sprintf('<pubDate>%s</pubDate>', $quote->getCreatedAt()->format(\DateTime::RFC822));
-                $xml .= '</item>';
+                $xml = vsprintf(
+                    '<item><title>Quote #%d</title><description>%s</description><link>%s/q/%d</link><pubDate>%s</pubDate></item>',
+                    [
+                        $quote->getId(),
+                        $quote->getContent(),
+                        \getenv('APP_DOMAIN'),
+                        $quote->getId().
+                        $quote->getCreatedAt()->format(\DateTimeInterface::RFC822),
+                    ]
+                );
             }
         }
-        $xml .= '</channel>';
-        $xml .= '</rss>';
+        $xml .= '</channel></rss>';
         return $xml;
     }
 }

@@ -5,24 +5,21 @@ namespace App\Controller\Api;
 
 use App\Entity\Quote;
 use App\Provider\QuoteProvider;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Uid\Uuid;
 
-/**
- * Class QuoteController
- * @package App\Controller\Api
- */
-class QuoteController extends Controller
+class QuoteController extends AbstractController
 {
-    /**
-     * @param Request $request
-     * @param QuoteProvider $provider
-     * @return JsonResponse
-     * @Route("/api/quotes/page/{pageNumber}/{perPage}", name="quotes", methods={"GET"})
-     */
+    public function __construct(private readonly EntityManagerInterface $entityManager)
+    {
+    }
+
+    #[Route(path: '/api/quotes/page/{pageNumber}/{perPage}', name: 'quotes', methods: ['GET'])]
     public function getQuotes(Request $request, QuoteProvider $provider): JsonResponse
     {
         $data = $provider->getAllQuotes(
@@ -34,18 +31,13 @@ class QuoteController extends Controller
                 [
                     'error' => 'No quotes found.'
                 ],
-                404
+                Response::HTTP_NOT_FOUND
             );
         }
         return $this->json($data);
     }
 
-    /**
-     * @param Request $request
-     * @param QuoteProvider $provider
-     * @return JsonResponse
-     * @Route("/api/quotes/{quoteId}", name="quote", methods={"GET"})
-     */
+    #[Route(path: '/api/quotes/{quoteId}', name: 'quote', methods: ['GET'])]
     public function getQuote(Request $request, QuoteProvider $provider): JsonResponse
     {
         $data = $provider->getQuote((int)$request->get('quoteId'));
@@ -57,47 +49,44 @@ class QuoteController extends Controller
                         $request->get('quoteId')
                     )
                 ],
-                404
+                Response::HTTP_NOT_FOUND
             );
         }
         return $this->json($data);
     }
 
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     * @Route("/api/quotes/{quoteId}/rate/{type}")
-     */
+    #[Route(path: '/api/quotes/{quoteId}/rate/{type}')]
     public function rateQuote(Request $request): JsonResponse
     {
         return $this->json(['quote' => $request->get('quoteId'), 'rate' => $request->get('type')]);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     * @Route("/api/quotes/add", methods={"POST"})
-     */
+    #[Route(path: 'api/quotes/add', methods: ['POST'])]
     public function addQuote(Request $request): Response
     {
+        // @todo: deserialize it
         $content = json_decode($request->getContent(), true);
         if (array_key_exists('content', $content) && !empty($content['content'])) {
-            $quote = new Quote();
-            $quote->setScore(0);
-            $quote->setContent($content['content']);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($quote);
-            $em->flush();
-            $message = ['message' => 'Quote created!', 'quote_id' => $quote->getId()];
+            $quote = new Quote(Uuid::v4(), $content['content']);
+            $this->entityManager->persist($quote);
+            $this->entityManager->flush();
 
-            $response = new Response(json_encode($message), 201);
-            $response->headers->set('Content-Type', 'application/json');
-            $response->headers->set('Location', '/api/quotes/'. $quote->getId());
-            return $response;
+            return new JsonResponse(
+                [
+                    'message' => 'Quote created!',
+                    'id' => (string) $quote->getId(),
+                    'quote_id' => $quote->getQuoteId(),
+                ],
+                Response::HTTP_CREATED,
+                [
+                    'Location' => '/api/quotes/' . $quote->getQuoteId(),
+                ]
+            );
         }
-        $message = ['message' => 'Content cannot be empty.'];
-        $response = new Response(json_encode($message), 400);
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+
+        return new JsonResponse(
+            ['message' => 'Content cannot be empty.'],
+            Response::HTTP_BAD_REQUEST
+        );
     }
 }

@@ -6,31 +6,16 @@ namespace App\EventListener;
 use App\Event\VoteEvent;
 use App\Events\RatingEvents;
 use App\Manager\RatingManager;
+use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class RatingUpdateRateEventListener
- * @package App\EventListener
- */
 class RatingUpdateRateEventListener implements EventSubscriberInterface
 {
-    /**
-     * @var RatingManager
-     */
-    private $ratingManager;
-
-    /**
-     * RatingUpdateRateEventListener constructor.
-     * @param RatingManager $ratingManager
-     */
-    public function __construct(RatingManager $ratingManager)
+    public function __construct(private readonly RatingManager $ratingManager)
     {
-        $this->ratingManager = $ratingManager;
     }
 
-    /**
-     * @return array
-     */
+    #[ArrayShape([RatingEvents::RATING_CREATE => "string"])]
     public static function getSubscribedEvents(): array
     {
         return [
@@ -38,9 +23,6 @@ class RatingUpdateRateEventListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param VoteEvent $event
-     */
     public function onCreateVote(VoteEvent $event): void
     {
         $rating = $event->getVote()->getValue();

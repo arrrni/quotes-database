@@ -1,5 +1,0 @@
-App\Entity\Quote:
-    quote_{1..100}:
-        content: <sentence()>
-        score: <numberBetween(1, 100)>
-        createdAt: <dateTimeBetween("-200 days", "now")>

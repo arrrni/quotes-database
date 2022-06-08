@@ -1,129 +1,81 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Component\Uid\Uuid;
 
-/**
- * Class Quote
- * @package App\Entity
- * @ORM\Entity()
- * @ORM\Table(name="quote")
- */
+#[
+    ORM\Entity,
+    ORM\Table(name: 'quote')
+]
 class Quote
 {
-    /**
-     * @var int
-     * @ORM\Id()
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[
+        ORM\Id,
+        ORM\Column(type: 'uuid'),
+        ORM\GeneratedValue(strategy: 'CUSTOM'),
+        ORM\CustomIdGenerator(class: UuidGenerator::class)
+    ]
+    private Uuid $id;
 
-    /**
-     * @var string
-     * @ORM\Column(name="content", type="text")
-     */
-    private $content;
+    #[
+        ORM\Column(type: 'integer'),
+        ORM\GeneratedValue(strategy: 'AUTO')
+    ]
+    private readonly int $quoteId;
 
-    /**
-     * @var int
-     * @ORM\Column(name="score", type="integer")
-     */
-    private $score;
+    #[ORM\Column(name: 'content', type: 'text')]
+    private string $content;
 
-    /**
-     * @var \DateTime
-     * @ORM\Column(name="created_at", type="datetime")
-     */
-    private $createdAt;
+    #[ORM\Column(name: 'score', type: 'integer', options: ['default' => 0])]
+    private int $score;
 
-    /**
-     * @var \DateTime
-     * @ORM\Column(name="updated_at", type="datetime")
-     */
-    private $updatedAt;
+    #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
+    private readonly \DateTimeImmutable $createdAt;
 
-    /**
-     * Quote constructor.
-     */
-    public function __construct()
+    #[ORM\Column(type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private \DateTime $updatedAt;
+
+    public function __construct(Uuid $id, string $content, int $score = 0)
     {
-        $this->createdAt = new \DateTime();
+        $this->id = $id;
+        $this->content = $content;
+        $this->score = $score;
+        $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTime();
     }
 
-    /**
-     * @return int
-     */
-    public function getId(): int
+    public function getId(): Uuid
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
+    public function getQuoteId(): int
+    {
+        return $this->quoteId;
+    }
+
     public function getContent(): string
     {
         return $this->content;
     }
 
-    /**
-     * @param string $content
-     */
-    public function setContent(string $content): void
-    {
-        $this->content = $content;
-    }
-
-    /**
-     * @return int
-     */
     public function getScore(): int
     {
         return $this->score;
     }
 
-    /**
-     * @param int $score
-     */
-    public function setScore(int $score): void
-    {
-        $this->score = $score;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    /**
-     * @param \DateTime $createdAt
-     */
-    public function setCreatedAt(\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    /**
-     * @return \DateTime
-     */
     public function getUpdatedAt(): \DateTime
     {
         return $this->updatedAt;
-    }
-
-    /**
-     * @param \DateTime $updatedAt
-     * @return void
-     */
-    public function setUpdatedAt(\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
     }
 }

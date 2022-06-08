@@ -5,7 +5,7 @@ namespace App\Provider;
 
 use App\Entity\Quote;
 use Doctrine\ORM\EntityManagerInterface;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -13,39 +13,23 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-/**
- * Class QuoteProvider
- * @package App
- */
 class QuoteProvider
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * QuoteProvider constructor.
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param int $perPage
-     * @param int $page
-     * @return array
-     */
     public function getAllQuotes(int $perPage, int $page): ?array
     {
         $result = null;
         $serializer = $this->getSerializer();
-        $adapter = new DoctrineORMAdapter(
+
+        $adapter = new ArrayAdapter(
             $this->entityManager->createQueryBuilder()
                 ->select('quote')
                 ->from(Quote::class, 'quote')
+                ->getQuery()
+                ->getArrayResult()
         );
         $paginator = new Pagerfanta($adapter);
         $paginator->setMaxPerPage($perPage);
@@ -68,10 +52,6 @@ class QuoteProvider
         return $result;
     }
 
-    /**
-     * @param int $quoteId
-     * @return array
-     */
     public function getQuote(int $quoteId): ?array
     {
         $serializer = $this->getSerializer();
@@ -79,10 +59,6 @@ class QuoteProvider
         return $serializer->normalize($quote);
     }
 
-    /**
-     * Sets up Symfony Serializer component
-     * @return Serializer
-     */
     private function getSerializer(): Serializer
     {
         $encoders = [

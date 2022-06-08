@@ -9,25 +9,9 @@ namespace App\Model;
  */
 interface VoteInterface
 {
-    /**
-     * @param bool $value
-     * @return VoteInterface
-     */
-    public function setValue(bool $value): VoteInterface;
+    public static function forQuote(int $quoteId, bool $value): self;
 
-    /**
-     * @return bool
-     */
     public function getValue(): bool;
 
-    /**
-     * @param int $quoteId
-     * @return VoteInterface
-     */
-    public function setQuoteId(int $quoteId): VoteInterface;
-
-    /**
-     * @return int
-     */
     public function getQuoteId(): int;
 }
